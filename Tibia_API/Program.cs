@@ -2,9 +2,21 @@
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            var requestURL = @"https://www.tibia.com/community/?name=sunrise";
+            HttpClient client = new HttpClient();
+
+            HttpResponseMessage reqResp = await client.GetAsync(requestURL);
+
+            if (reqResp.IsSuccessStatusCode)
+            {
+                HttpContent content = reqResp.Content;
+                var result = await content.ReadAsStringAsync();
+            }
+
+
+
         }
     }
 }
