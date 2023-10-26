@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System.IO.Compression;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace Tibia_API
 {
@@ -31,8 +33,28 @@ namespace Tibia_API
             if (reqResp.IsSuccessStatusCode)
             {
                 HttpContent content = reqResp.Content;
-                var result = await content.ReadAsStringAsync();
+                var brotResult = await content.ReadAsByteArrayAsync();
+
+                //Decompress brotli encoding
+                var utfResult = BrotliToUTF8(brotResult);
             }
+        }
+
+
+        public static string BrotliToUTF8(byte[] brotBytes)
+        {
+            var mStreamInput = new MemoryStream(brotBytes);
+            var mStreamOutput = new MemoryStream();
+            var brotStream = new BrotliStream(mStreamInput, CompressionMode.Decompress);
+
+            byte[] bytes = new byte[brotStream.BaseStream.Length];
+            int count;
+            while ((count = brotStream.Read(bytes, 0, bytes.Length)) != 0)
+            {
+                mStreamOutput.Write(bytes, 0, count);
+            }
+
+            return Encoding.UTF8.GetString(mStreamOutput.ToArray());
         }
     }
 }
