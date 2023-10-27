@@ -1,6 +1,10 @@
-﻿using System.IO.Compression;
+﻿using HtmlAgilityPack;
+using System;
+using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Tibia_API
 {
@@ -34,15 +38,34 @@ namespace Tibia_API
 
             HttpResponseMessage reqResp = await client.GetAsync(requestURL);
 
-            if (reqResp.IsSuccessStatusCode)
-            {
-                HttpContent content = reqResp.Content;
-                var brotResult = await content.ReadAsByteArrayAsync();
+            //if (reqResp.IsSuccessStatusCode)
+            //{
+            //    HttpContent content = reqResp.Content;
+            //    var brotResult = await content.ReadAsByteArrayAsync();
 
-                //Decompress brotli encoding
-                var utfResult = BrotliToUTF8(brotResult);
+            //    //Decompress brotli encoding
+            //    var utfResult = BrotliToUTF8(brotResult);
+            //}
+
+            var doc = new HtmlDocument();
+            doc.LoadHtml(htmlTestString);
+
+            //var table6_xp = doc.DocumentNode.SelectSingleNode("//table[6]"); //xpath doesnt work
+            //var table_6_lq = doc.DocumentNode.Descendants("table").Skip(5).FirstOrDefault(); //linq works
+
+            var allTables = doc.DocumentNode.SelectNodes("//table");
+            List<string> tableHtml = new List<string>();
+
+            foreach (var table in allTables)
+            {
+                tableHtml.Add(table.InnerHtml);
             }
+
+            var charInfo = tableHtml.Where(x => x.Contains("Character Information")).FirstOrDefault();
+            var achievementInfo = tableHtml.Where(x => x.Contains("Account Achievements")).FirstOrDefault();
+            var subCharInfo = tableHtml.Where(x => x.Contains("Characters")).FirstOrDefault();
         }
+
 
 
         public static string BrotliToUTF8(byte[] brotBytes)
