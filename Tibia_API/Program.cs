@@ -1,10 +1,12 @@
 ﻿using HtmlAgilityPack;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Tibia_API
@@ -64,18 +66,46 @@ namespace Tibia_API
             var charInfoNoHtml = RemoveHTML(charInfo);
             if (!string.IsNullOrEmpty(charInfoNoHtml))
             {
+                var charDict = new Dictionary<string, string>();
+
                 var charNamePair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Name:"), charInfoNoHtml.IndexOf("Title:") - charInfoNoHtml.IndexOf("Name:")).Split(':', 2);
+                charDict.Add(charNamePair[0], charNamePair[1]);
+
                 var charTitlePair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Title:"), charInfoNoHtml.IndexOf("Sex:") - charInfoNoHtml.IndexOf("Title:")).Split(':', 2);
+                charDict.Add(charTitlePair[0], charTitlePair[1]);
+
                 var charSexPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Sex:"), charInfoNoHtml.IndexOf("Vocation:") - charInfoNoHtml.IndexOf("Sex:")).Split(':', 2);
+                charDict.Add(charSexPair[0], charSexPair[1]);
+
                 var charVocPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Vocation:"), charInfoNoHtml.IndexOf("Level:") - charInfoNoHtml.IndexOf("Vocation:")).Split(':', 2);
+                charDict.Add(charVocPair[0], charVocPair[1]);
+
                 var charLevelPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Level:"), charInfoNoHtml.IndexOf("Achievement Points:") - charInfoNoHtml.IndexOf("Level:")).Split(':', 2);
+                charDict.Add(charLevelPair[0], charLevelPair[1]);
+
                 var charAchPtPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Achievement Points:"), charInfoNoHtml.IndexOf("World:") - charInfoNoHtml.IndexOf("Achievement Points:")).Split(':', 2);
+                charDict.Add(charAchPtPair[0], charAchPtPair[1]);
+
                 var charWorldPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("World:"), charInfoNoHtml.IndexOf("Residence:") - charInfoNoHtml.IndexOf("World:")).Split(':', 2);
+                charDict.Add(charWorldPair[0], charWorldPair[1]);
+
                 var charResPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Residence:"), charInfoNoHtml.IndexOf("Guild&#160;Membership:") - charInfoNoHtml.IndexOf("Residence:")).Split(':', 2);
+                charDict.Add(charResPair[0], charResPair[1]);
+
                 var charGuildPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Guild&#160;Membership:"), charInfoNoHtml.IndexOf("Login:") - charInfoNoHtml.IndexOf("Guild&#160;Membership:")).Split(':', 2);
+                charDict.Add(charGuildPair[0], charGuildPair[1]);
+
                 var charLoginPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Login:"), charInfoNoHtml.IndexOf("Comment:") - charInfoNoHtml.IndexOf("Login:")).Split(':', 2);
+                charDict.Add(charLoginPair[0], charLoginPair[1]);
+
                 var charCommentPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Comment:"), charInfoNoHtml.IndexOf("Account&#160;Status:") - charInfoNoHtml.IndexOf("Comment:")).Split(':', 2);
+                charDict.Add(charCommentPair[0], charCommentPair[1]);
+
                 var charAccStatPair = charInfoNoHtml.Substring(charInfoNoHtml.IndexOf("Account&#160;Status:")).Split(':', 2);
+                charDict.Add(charAccStatPair[0], charAccStatPair[1]);
+
+
+                string json = JsonConvert.SerializeObject(charDict, Newtonsoft.Json.Formatting.Indented);
             }
         }
 
