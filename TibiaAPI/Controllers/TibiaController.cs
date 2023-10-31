@@ -52,6 +52,11 @@ namespace TibiaAPI.Controllers
                 //Decompress brotli encoding
                 var utfResult = BrotliToUTF8(brotResult);
 
+                if (utfResult.Contains("Could not find character"))
+                {
+                    return BadRequest("Invalid character name.");
+                }
+
                 var doc = new HtmlDocument();
                 doc.LoadHtml(utfResult);
 
